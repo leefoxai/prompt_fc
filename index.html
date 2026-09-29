@@ -9,7 +9,7 @@
 <script>
 (async()=>{
   try{
-    const response=await fetch('game.html?v=20260929-hud1',{cache:'no-store'});
+    const response=await fetch('game.html?v=20260929-ui2',{cache:'no-store'});
     if(!response.ok) throw new Error('game.html load failed: '+response.status);
     const source=await response.text();
     const doc=new DOMParser().parseFromString(source,'text/html');
@@ -22,6 +22,7 @@
     const goals=doc.getElementById('goals');
     const shots=doc.getElementById('shots');
     const input=doc.querySelector('.inputpanel');
+    const bottomnote=doc.querySelector('.bottomnote');
 
     if(hud&&progress&&marks){
       hud.classList.add('roundhud');
@@ -43,6 +44,26 @@
     if(result&&board){
       if(input) input.after(result); else board.before(result);
       board.remove();
+    }
+
+    if(bottomnote) bottomnote.remove();
+
+    const gameScript=[...doc.scripts].find(s=>s.textContent.includes('function kicker(')&&s.textContent.includes('function setBusy('));
+    if(gameScript){
+      let code=gameScript.textContent;
+      code=code.replace(
+        "limb(ctx,hipR.x,hipR.y,kneeR.x,kneeR.y,'#ad8062',20);limb(ctx,kneeR.x,kneeR.y,ankleR.x,ankleR.y,'#d7e7f0',17);limb(ctx,ankleR.x,ankleR.y,toeR.x,toeR.y,'#ddfd80',11);",
+        "limb(ctx,hipR.x,hipR.y,kneeR.x,kneeR.y,'#ad8062',20);limb(ctx,kneeR.x,kneeR.y,ankleR.x,ankleR.y,'#d7e7f0',17);limb(ctx,ankleR.x,ankleR.y,toeR.x,toeR.y,'#152432',11);"
+      );
+      code=code.replace(
+        "function setBusy(b){$('shoot').disabled=b||shotCount>=ROUND_SIZE;$('shoot').textContent=shotCount>=ROUND_SIZE?'5회 슛 완료':`슛하기 (${shotCount+1} / 5) ↗`;$('prompt').disabled=b||shotCount>=ROUND_SIZE;$('newround').disabled=b;$('replay').disabled=b||!last;$('reset').disabled=b;document.querySelectorAll('[data-example]').forEach(e=>e.disabled=b||shotCount>=ROUND_SIZE);}",
+        "function setBusy(b){const done=shotCount>=ROUND_SIZE;$('shoot').disabled=b;$('shoot').textContent=done?'다시하기 ↺':`슛하기 (${shotCount+1} / 5) ↗`;$('prompt').disabled=b||done;$('newround').disabled=b;$('replay').disabled=b||!last;$('reset').disabled=b;document.querySelectorAll('[data-example]').forEach(e=>e.disabled=b||done);}"
+      );
+      code=code.replace(
+        "function submitShot(){if(active||shotCount>=ROUND_SIZE)return;current=analyze($('prompt').value);start();}",
+        "function submitShot(){if(active)return;if(shotCount>=ROUND_SIZE){resetRound();return;}current=analyze($('prompt').value);start();}"
+      );
+      gameScript.textContent=code;
     }
 
     const style=doc.createElement('style');
