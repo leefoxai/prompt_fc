@@ -9,7 +9,7 @@
 <script>
 (async()=>{
   try{
-    const response=await fetch('game.html?v=20260930-ui4',{cache:'no-store'});
+    const response=await fetch('game.html?v=20260930-ui5',{cache:'no-store'});
     if(!response.ok) throw new Error('game.html load failed: '+response.status);
     const source=await response.text();
     const doc=new DOMParser().parseFromString(source,'text/html');
@@ -49,7 +49,7 @@
     }
 
     if(bottomnote) bottomnote.remove();
-    if(scenehint) scenehint.remove();
+    if(scenehint) scenehint.hidden=true;
     if(footer){
       const localEdition=[...footer.querySelectorAll('span')].find(el=>el.textContent.includes('LOCAL EDITION'));
       if(localEdition) localEdition.remove();
@@ -75,6 +75,7 @@
 
     const style=doc.createElement('style');
     style.textContent=`
+      #scenehint{display:none!important}
       .roundhud{z-index:6;align-items:stretch;box-shadow:0 3px 20px #0006}
       .roundhud .hud-brand{display:flex;align-items:center;background:#101922e8!important;padding:9px 13px!important;border-left:3px solid var(--lime);color:var(--lime);font-size:12px;font-weight:900;white-space:nowrap}
       .roundhud .hud-round{display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:12px;background:#101922e8!important;padding:6px 10px 7px!important;min-width:265px}
