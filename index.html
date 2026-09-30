@@ -9,7 +9,7 @@
 <script>
 (async()=>{
   try{
-    const response=await fetch('game.html?v=20260929-ui2',{cache:'no-store'});
+    const response=await fetch('game.html?v=20260930-ui3',{cache:'no-store'});
     if(!response.ok) throw new Error('game.html load failed: '+response.status);
     const source=await response.text();
     const doc=new DOMParser().parseFromString(source,'text/html');
@@ -23,6 +23,7 @@
     const shots=doc.getElementById('shots');
     const input=doc.querySelector('.inputpanel');
     const bottomnote=doc.querySelector('.bottomnote');
+    const scenehint=doc.getElementById('scenehint');
 
     if(hud&&progress&&marks){
       hud.classList.add('roundhud');
@@ -47,6 +48,7 @@
     }
 
     if(bottomnote) bottomnote.remove();
+    if(scenehint) scenehint.remove();
 
     const gameScript=[...doc.scripts].find(s=>s.textContent.includes('function kicker(')&&s.textContent.includes('function setBusy('));
     if(gameScript){
